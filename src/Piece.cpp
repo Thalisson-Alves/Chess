@@ -15,7 +15,7 @@ sf::IntRect getSpriteRect(const enum Piece::Type &type) {
 }
 
 Piece::Piece(const sf::Texture &texture, enum Type type, int position) :
-        Position(position), Type(type), hasMoved(false), Sprite(texture, getSpriteRect(type)) {
+        Position(position), Type(type), hasMoved(false), IsSelected(false), Sprite(texture, getSpriteRect(type)) {
     auto tileWidth = Config::getTileWidth();
     auto tileHeight = Config::getTileHeight();
     int x = Position % Config::BoardSize;
@@ -35,6 +35,6 @@ const enum Piece::Type &Piece::getType() const {
     return Type;
 }
 
-sf::Sprite &Piece::getSprite() {
-    return Sprite;
+void Piece::toggleSelect() {
+    IsSelected = not IsSelected;
 }

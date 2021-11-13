@@ -11,16 +11,13 @@ public:
 
     void draw(sf::RenderTarget &target, sf::RenderStates states) const override;
 
-    Piece::Ptr &getPiece(int index);
-
-    const enum Piece::Type &getTurn() const;
+    void selectPiece(int index);
 
 private:
     std::array<Piece::Ptr, 64> Pieces;
+    enum Piece::Type Turn;
 
     void loadPiecesFromFen(const sf::Texture &texture, const std::string &fenString);
-
-    enum Piece::Type Turn;
 
     static void drawBackground(sf::RenderTarget &target, const sf::RenderStates &states);
 };

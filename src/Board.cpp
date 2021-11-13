@@ -1,3 +1,4 @@
+#include <cassert>
 #include "Board.h"
 #include "King.h"
 #include "Queen.h"
@@ -83,10 +84,8 @@ void Board::drawBackground(sf::RenderTarget &target, const sf::RenderStates &sta
     }
 }
 
-Piece::Ptr &Board::getPiece(int index) {
-    return Pieces[index];
-}
-
-const enum Piece::Type &Board::getTurn() const {
-    return Turn;
+void Board::selectPiece(int index) {
+    assert(index >= 0 && index < Pieces.size());
+    if (Pieces[index]->getType() & Turn)
+        Pieces[index]->toggleSelect();
 }

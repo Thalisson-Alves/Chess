@@ -1,13 +1,21 @@
 #ifndef CHESS_GLOBALS_H
 #define CHESS_GLOBALS_H
 
+#include <SFML/Graphics/RenderWindow.hpp>
+
 namespace Config {
     extern const int BoardSize;
-    extern int WindowWidth;
-    extern int WindowHeight;
+    extern const int WindowWidth;
+    extern const int WindowHeight;
 
     float getTileWidth();
     float getTileHeight();
+}
+
+namespace ConfigMouse {
+    extern sf::RenderWindow *Window;
+
+    int getMouseIndex();
 }
 
 #endif //CHESS_GLOBALS_H

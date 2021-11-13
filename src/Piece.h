@@ -29,13 +29,15 @@ public:
     void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 
     const Piece::Type &getType() const;
-    sf::Sprite &getSprite();
+
+    void toggleSelect();
 
 private:
     Type Type;
     sf::Sprite Sprite;
     int Position;
     bool hasMoved;
+    bool IsSelected;
 };
 
 
