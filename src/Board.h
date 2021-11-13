@@ -21,8 +21,13 @@ private:
     enum Piece::Type Turn;
 
     void loadPiecesFromFen(const sf::Texture &texture, const std::string &fenString);
+
     static void drawBackground(sf::RenderTarget &target, const sf::RenderStates &states);
+    void drawPieces(sf::RenderTarget &target, sf::RenderStates &states) const;
+    void drawSelectedPieceMoves(sf::RenderTarget &target, const sf::RenderStates &states) const;
+
     bool hasSelectedPiece() const;
+
 };
 
 

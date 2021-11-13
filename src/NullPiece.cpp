@@ -4,6 +4,6 @@ NullPiece::NullPiece(const sf::Texture &texture, enum Piece::Type type, int posi
 
 }
 
-std::vector<Piece::Move> NullPiece::getLegalMoves() const {
+std::vector<Piece::Move> NullPiece::getLegalMoves(const std::array<Piece::Ptr, 64> &pieces) const {
     return {};
 }

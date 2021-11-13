@@ -64,10 +64,42 @@ void Board::draw(sf::RenderTarget &target, sf::RenderStates states) const {
     states.transform *= getTransform();
 
     drawBackground(target, states);
+    drawSelectedPieceMoves(target, states);
+    drawPieces(target, states);
+}
 
+void Board::drawSelectedPieceMoves(sf::RenderTarget &target, const sf::RenderStates &states) const {
+    if (not hasSelectedPiece())
+        return;
+
+    auto circle = sf::CircleShape(Config::getTileWidth() / 6.0f);
+    const auto &localBounds = circle.getLocalBounds();
+    circle.setOrigin(localBounds.width / 2.0f, localBounds.height / 2.0f);
+    circle.setFillColor(sf::Color(165, 167, 195, 200));
+
+    auto rectangle = sf::RectangleShape(sf::Vector2f(Config::getTileHeight() - 3, Config::getTileHeight() - 3));
+    rectangle.setFillColor(sf::Color(0, 0, 0, 0));
+    rectangle.setOutlineColor(sf::Color(255, 0, 0, 100));
+    rectangle.setOutlineThickness(3);
+
+    for (auto move: Pieces[SelectedPieceIndex]->getLegalMoves(Pieces)) {
+        int x = move.toPosition % 8;
+        int y = move.toPosition / 8;
+        auto position = sf::Vector2f(x * Config::getTileWidth() + Config::getTileWidth() / 2.0f,
+                                     y * Config::getTileHeight() + Config::getTileWidth() / 2.0f);
+        if (Pieces[move.toPosition]->getType() == Piece::None) {
+            circle.setPosition(position);
+            target.draw(circle, states);
+        } else {
+            rectangle.setPosition(position);
+            target.draw(rectangle, states);
+        }
+    }
+}
+
+void Board::drawPieces(sf::RenderTarget &target, sf::RenderStates &states) const {
     for (const auto &piece: Pieces)
-        if (piece)
-            piece->draw(target, states);
+        piece->draw(target, states);
 }
 
 void Board::drawBackground(sf::RenderTarget &target, const sf::RenderStates &states) {

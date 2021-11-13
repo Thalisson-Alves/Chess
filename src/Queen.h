@@ -8,7 +8,7 @@ class Queen : public Piece {
 public:
     Queen(const sf::Texture &texture, enum Piece::Type type, int position);
 
-    std::vector<Piece::Move> getLegalMoves() const override;
+    std::vector<Move> getLegalMoves(const std::array<Piece::Ptr, 64> &pieces) const override;
 };
 
 

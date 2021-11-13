@@ -24,7 +24,10 @@ public:
     };
 
     struct Move {
+        enum class Type {None, Normal};
 
+        int fromPosition, toPosition;
+        Move::Type type;
     };
 
 public:
@@ -36,9 +39,9 @@ public:
 
     const Piece::Type &getType() const;
 
-    virtual std::vector<Move> getLegalMoves() const = 0;
+    virtual std::vector<Move> getLegalMoves(const std::array<Piece::Ptr, 64> &pieces) const = 0;
 
-private:
+protected:
     Type Type;
     sf::Sprite Sprite;
     int Position;
