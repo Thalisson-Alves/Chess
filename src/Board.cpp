@@ -70,11 +70,10 @@ void Board::draw(sf::RenderTarget &target, sf::RenderStates states) const {
 }
 
 void Board::drawBackground(sf::RenderTarget &target, const sf::RenderStates &states) {
-    auto rectangle = sf::RectangleShape(sf::Vector2f((float) Config::WindowWidth / (float) Config::BoardSize,
-                                                     (float) Config::WindowHeight / (float) Config::BoardSize));
+    auto rectangle = sf::RectangleShape(sf::Vector2f(Config::getTileWidth(), Config::getTileHeight()));
     for (int i = 0; i < Config::BoardSize; i++) {
         for (int j = 0; j < Config::BoardSize; j++) {
-            rectangle.setPosition((float) j * rectangle.getSize().y, (float) i * rectangle.getSize().x);
+            rectangle.setPosition((float) j * rectangle.getSize().x, (float) i * rectangle.getSize().y);
             if (((i + j) & 1) == 0)
                 rectangle.setFillColor(sf::Color(232, 235, 239));
             else

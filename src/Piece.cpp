@@ -16,15 +16,15 @@ sf::IntRect getSpriteRect(const enum Piece::Type &type) {
 
 Piece::Piece(const sf::Texture &texture, enum Type type, int position) :
         Position(position), Type(type), hasMoved(false), Sprite(texture, getSpriteRect(type)) {
-    // TODO - Make the tileSize related to the width and height. Not only one of them
-    const float tileSize = static_cast<float>(Config::WindowWidth) / static_cast<float>(Config::BoardSize);
+    auto tileWidth = Config::getTileWidth();
+    auto tileHeight = Config::getTileHeight();
     int x = Position % Config::BoardSize;
     int y = Position / Config::BoardSize;
 
     const auto &localBounds = Sprite.getLocalBounds();
     Sprite.setOrigin(localBounds.width / 2.0f, localBounds.height / 2.0f);
     Sprite.setScale(0.45, 0.45);
-    Sprite.setPosition(x * tileSize + tileSize / 2.0f, y * tileSize + tileSize / 2.0f);
+    Sprite.setPosition(x * tileWidth + tileWidth / 2.0f, y * tileHeight + tileHeight / 2.0f);
 }
 
 void Piece::draw(sf::RenderTarget &target, sf::RenderStates states) const {
