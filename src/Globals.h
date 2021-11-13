@@ -12,10 +12,4 @@ namespace Config {
     float getTileHeight();
 }
 
-namespace ConfigMouse {
-    extern sf::RenderWindow *Window;
-
-    int getMouseIndex();
-}
-
 #endif //CHESS_GLOBALS_H

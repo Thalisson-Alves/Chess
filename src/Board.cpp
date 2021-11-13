@@ -86,6 +86,15 @@ void Board::drawBackground(sf::RenderTarget &target, const sf::RenderStates &sta
 
 void Board::selectPiece(int index) {
     assert(index >= 0 && index < Pieces.size());
+
+    for (const auto &piece: Pieces)
+        piece->deselect();
+
     if (Pieces[index]->getType() & Turn)
-        Pieces[index]->toggleSelect();
+        Pieces[index]->select();
+}
+
+void Board::update(const sf::Window &window) {
+    for (const auto &piece: Pieces)
+        piece->update(window);
 }

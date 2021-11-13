@@ -1,5 +1,3 @@
-#include <SFML/Window/Mouse.hpp>
-#include <cassert>
 #include "Globals.h"
 
 const int Config::BoardSize = 8;
@@ -12,15 +10,4 @@ float Config::getTileWidth() {
 
 float Config::getTileHeight() {
     return static_cast<float>(WindowHeight) / static_cast<float>(BoardSize);
-}
-
-sf::RenderWindow *ConfigMouse::Window = nullptr;
-
-int ConfigMouse::getMouseIndex() {
-    assert(Window);
-
-    auto mousePosition = sf::Mouse::getPosition(*Window);
-    auto tileWidth = static_cast<int>(Config::getTileWidth());
-    auto tileHeight = static_cast<int>(Config::getTileHeight());
-    return mousePosition.y / tileHeight * Config::BoardSize + mousePosition.x / tileWidth;
 }

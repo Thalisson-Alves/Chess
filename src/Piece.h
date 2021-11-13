@@ -30,7 +30,10 @@ public:
 
     const Piece::Type &getType() const;
 
-    void toggleSelect();
+    void select();
+    void deselect();
+
+    void update(const sf::Window &window);
 
 private:
     Type Type;
@@ -38,6 +41,8 @@ private:
     int Position;
     bool hasMoved;
     bool IsSelected;
+
+    void resetSpritePosition();
 };
 
 

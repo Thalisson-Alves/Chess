@@ -13,6 +13,8 @@ public:
 
     void selectPiece(int index);
 
+    void update(const sf::Window &window);
+
 private:
     std::array<Piece::Ptr, 64> Pieces;
     enum Piece::Type Turn;

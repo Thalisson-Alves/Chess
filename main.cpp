@@ -5,8 +5,6 @@
 int main() {
     // TODO - window resize in runtime is not working!
     sf::RenderWindow window(sf::VideoMode(Config::WindowWidth, Config::WindowHeight), "Chess", sf::Style::Close);
-    // Initialize the global Window, so we can get the mouse position relative to it.
-    ConfigMouse::Window = &window;
 
     sf::Texture texture;
     texture.loadFromFile("../Images/pieceSprites.png");
@@ -24,11 +22,18 @@ int main() {
                     break;
                 case sf::Event::MouseButtonPressed:
                     if (event.mouseButton.button == sf::Mouse::Left) {
-                        board.selectPiece(ConfigMouse::getMouseIndex());
+                        auto mousePosition = sf::Mouse::getPosition(window);
+                        auto tileWidth = static_cast<int>(Config::getTileWidth());
+                        auto tileHeight = static_cast<int>(Config::getTileHeight());
+                        auto index = mousePosition.y / tileHeight * Config::BoardSize + mousePosition.x / tileWidth;
+
+                        board.selectPiece(index);
                     }
                     break;
             }
         }
+
+        board.update(window);
 
         window.clear();
         window.draw(board);
