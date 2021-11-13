@@ -15,7 +15,7 @@ sf::IntRect getSpriteRect(const enum Piece::Type &type) {
 }
 
 Piece::Piece(const sf::Texture &texture, enum Type type, int position) :
-        Position(position), Type(type), hasMoved(false), IsSelected(false), Sprite(texture, getSpriteRect(type)) {
+        Position(position), Type(type), hasMoved(false), Sprite(texture, getSpriteRect(type)) {
     const auto &localBounds = Sprite.getLocalBounds();
     Sprite.setOrigin(localBounds.width / 2.0f, localBounds.height / 2.0f);
     Sprite.setScale(0.45, 0.45);
@@ -40,21 +40,6 @@ const enum Piece::Type &Piece::getType() const {
     return Type;
 }
 
-void Piece::select() {
-    IsSelected = true;
-}
-
-void Piece::deselect() {
-    resetSpritePosition();
-    IsSelected = false;
-}
-
-void Piece::update(const sf::Window &window) {
-    if (not IsSelected)
-        return;
-
-    if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
-        auto mousePosition = sf::Mouse::getPosition(window);
-        Sprite.setPosition(mousePosition.x, mousePosition.y);
-    }
+void Piece::setSpritePosition(float x, float y) {
+    Sprite.setPosition(x, y);
 }

@@ -23,26 +23,26 @@ public:
         Black = 16
     };
 
+    struct Move {
+
+    };
+
 public:
     Piece(const sf::Texture &texture, Piece::Type type, int position);
 
     void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
+    void setSpritePosition(float x, float y);
+    void resetSpritePosition();
 
     const Piece::Type &getType() const;
 
-    void select();
-    void deselect();
-
-    void update(const sf::Window &window);
+    virtual std::vector<Move> getLegalMoves() const = 0;
 
 private:
     Type Type;
     sf::Sprite Sprite;
     int Position;
     bool hasMoved;
-    bool IsSelected;
-
-    void resetSpritePosition();
 };
 
 

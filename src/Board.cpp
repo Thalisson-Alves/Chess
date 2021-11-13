@@ -9,7 +9,7 @@
 #include "NullPiece.h"
 #include "Globals.h"
 
-Board::Board(const sf::Texture &texture, const std::string &fen) : Turn(Piece::Type::White) {
+Board::Board(const sf::Texture &texture, const std::string &fen) : Turn(Piece::Type::White), SelectedPieceIndex(-1) {
     loadPiecesFromFen(texture, fen);
 }
 
@@ -87,14 +87,25 @@ void Board::drawBackground(sf::RenderTarget &target, const sf::RenderStates &sta
 void Board::selectPiece(int index) {
     assert(index >= 0 && index < Pieces.size());
 
-    for (const auto &piece: Pieces)
-        piece->deselect();
+    // Deselect the current selected piece
+    if (hasSelectedPiece())
+        Pieces[SelectedPieceIndex]->resetSpritePosition();
 
-    if (Pieces[index]->getType() & Turn)
-        Pieces[index]->select();
+    // Select the piece only if is its turn
+    SelectedPieceIndex = (Pieces[index]->getType() & Turn ? index : -1);
 }
 
 void Board::update(const sf::Window &window) {
-    for (const auto &piece: Pieces)
-        piece->update(window);
+    if (not hasSelectedPiece())
+        return;
+
+    // Do the piece follow the mouse
+    if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
+        auto mousePosition = sf::Mouse::getPosition(window);
+        Pieces[SelectedPieceIndex]->setSpritePosition(mousePosition.x, mousePosition.y);
+    }
+}
+
+bool Board::hasSelectedPiece() const {
+    return SelectedPieceIndex >= 0;
 }

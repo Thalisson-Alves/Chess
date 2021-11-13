@@ -17,11 +17,12 @@ public:
 
 private:
     std::array<Piece::Ptr, 64> Pieces;
+    int SelectedPieceIndex;
     enum Piece::Type Turn;
 
     void loadPiecesFromFen(const sf::Texture &texture, const std::string &fenString);
-
     static void drawBackground(sf::RenderTarget &target, const sf::RenderStates &states);
+    bool hasSelectedPiece() const;
 };
 
 

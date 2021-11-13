@@ -7,6 +7,8 @@
 class Pawn : public Piece {
 public:
     Pawn(const sf::Texture &texture, enum Piece::Type type, int position);
+
+    std::vector<Piece::Move> getLegalMoves() const override;
 };
 
 

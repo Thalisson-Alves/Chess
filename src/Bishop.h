@@ -7,6 +7,8 @@
 class Bishop : public Piece {
 public:
     Bishop(const sf::Texture &texture, enum Piece::Type type, int position);
+
+    std::vector<Piece::Move> getLegalMoves() const override;
 };
 
 

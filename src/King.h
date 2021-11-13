@@ -7,6 +7,8 @@
 class King : public Piece{
 public:
     King(const sf::Texture &texture, enum Piece::Type type, int position);
+
+    std::vector<Piece::Move> getLegalMoves() const override;
 };
 
 
