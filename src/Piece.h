@@ -24,7 +24,7 @@ public:
     };
 
     struct Move {
-        enum class Type {None, Normal};
+        enum class Type {None, Normal, Attack};
 
         int fromPosition, toPosition;
         Move::Type type;
@@ -38,14 +38,16 @@ public:
     void resetSpritePosition();
 
     const Piece::Type &getType() const;
+    bool isEnemy(const Piece::Ptr &piece) const;
 
     virtual std::vector<Move> getLegalMoves(const std::array<Piece::Ptr, 64> &pieces) const = 0;
+    void setPosition(int index);
 
 protected:
     Type Type;
     sf::Sprite Sprite;
     int Position;
-    bool hasMoved;
+    bool HasMoved;
 };
 
 

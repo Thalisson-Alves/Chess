@@ -11,3 +11,7 @@ float Config::getTileWidth() {
 float Config::getTileHeight() {
     return static_cast<float>(WindowHeight) / static_cast<float>(BoardSize);
 }
+
+bool Utils::isInBoardRange(int x, int y) {
+    return (0 <= x && x <= Config::BoardSize) && (0 <= y && y <= Config::BoardSize);
+}

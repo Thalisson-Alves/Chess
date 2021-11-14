@@ -27,7 +27,20 @@ int main() {
                         auto tileHeight = static_cast<int>(Config::getTileHeight());
                         auto index = mousePosition.y / tileHeight * Config::BoardSize + mousePosition.x / tileWidth;
 
-                        board.selectPiece(index);
+                        if (board.hasSelectedPiece())
+                            board.movePieceToPosition(index);
+                        else
+                            board.selectPiece(index);
+                    }
+                    break;
+                case sf::Event::MouseButtonReleased:
+                    if (event.mouseButton.button == sf::Mouse::Left) {
+                        auto mousePosition = sf::Mouse::getPosition(window);
+                        auto tileWidth = static_cast<int>(Config::getTileWidth());
+                        auto tileHeight = static_cast<int>(Config::getTileHeight());
+                        auto index = mousePosition.y / tileHeight * Config::BoardSize + mousePosition.x / tileWidth;
+
+                        board.movePieceToPosition(index);
                     }
                     break;
             }

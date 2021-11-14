@@ -1,4 +1,5 @@
 #include <cassert>
+#include <iostream>
 #include "Board.h"
 #include "King.h"
 #include "Queen.h"
@@ -73,11 +74,13 @@ void Board::drawSelectedPieceMoves(sf::RenderTarget &target, const sf::RenderSta
         return;
 
     auto circle = sf::CircleShape(Config::getTileWidth() / 6.0f);
-    const auto &localBounds = circle.getLocalBounds();
-    circle.setOrigin(localBounds.width / 2.0f, localBounds.height / 2.0f);
+    const auto &circleBounds = circle.getLocalBounds();
+    circle.setOrigin(circleBounds.width / 2.0f, circleBounds.height / 2.0f);
     circle.setFillColor(sf::Color(165, 167, 195, 200));
 
     auto rectangle = sf::RectangleShape(sf::Vector2f(Config::getTileHeight() - 3, Config::getTileHeight() - 3));
+    const auto &rectangleBounds = rectangle.getLocalBounds();
+    rectangle.setOrigin(rectangleBounds.width / 2.0f, rectangleBounds.height / 2.0f);
     rectangle.setFillColor(sf::Color(0, 0, 0, 0));
     rectangle.setOutlineColor(sf::Color(255, 0, 0, 100));
     rectangle.setOutlineThickness(3);
@@ -119,19 +122,23 @@ void Board::drawBackground(sf::RenderTarget &target, const sf::RenderStates &sta
 void Board::selectPiece(int index) {
     assert(index >= 0 && index < Pieces.size());
 
-    // Deselect the current selected piece
-    if (hasSelectedPiece())
-        Pieces[SelectedPieceIndex]->resetSpritePosition();
+    deselectPiece();
 
     // Select the piece only if is its turn
     SelectedPieceIndex = (Pieces[index]->getType() & Turn ? index : -1);
+}
+
+void Board::deselectPiece() {
+    if (hasSelectedPiece())
+        Pieces[SelectedPieceIndex]->resetSpritePosition();
+    SelectedPieceIndex = -1;
 }
 
 void Board::update(const sf::Window &window) {
     if (not hasSelectedPiece())
         return;
 
-    // Do the piece follow the mouse
+    // The piece follow the mouse
     if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
         auto mousePosition = sf::Mouse::getPosition(window);
         Pieces[SelectedPieceIndex]->setSpritePosition(mousePosition.x, mousePosition.y);
@@ -140,4 +147,29 @@ void Board::update(const sf::Window &window) {
 
 bool Board::hasSelectedPiece() const {
     return SelectedPieceIndex >= 0;
+}
+
+void Board::movePieceToPosition(int positionIndex) {
+    if (not hasSelectedPiece() || positionIndex == SelectedPieceIndex)
+        return;
+
+    Piece::Move move{};
+    for (auto possibleMove: Pieces[SelectedPieceIndex]->getLegalMoves(Pieces))
+        if (possibleMove.toPosition == positionIndex)
+            move = possibleMove;
+
+    switch (move.type) {
+        case Piece::Move::Type::None:
+            break;
+        case Piece::Move::Type::Normal:
+            Pieces[move.fromPosition]->setPosition(move.toPosition);
+            Pieces[move.toPosition]->setPosition(move.fromPosition);
+            Pieces[move.fromPosition].swap(Pieces[move.toPosition]);
+            Turn = (Turn == Piece::Type::White ? Piece::Type::Black : Piece::Type::White);
+            break;
+        case Piece::Move::Type::Attack:
+            break;
+    }
+
+    deselectPiece();
 }

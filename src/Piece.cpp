@@ -15,7 +15,7 @@ sf::IntRect getSpriteRect(const enum Piece::Type &type) {
 }
 
 Piece::Piece(const sf::Texture &texture, enum Type type, int position) :
-        Position(position), Type(type), hasMoved(false), Sprite(texture, getSpriteRect(type)) {
+        Position(position), Type(type), HasMoved(false), Sprite(texture, getSpriteRect(type)) {
     const auto &localBounds = Sprite.getLocalBounds();
     Sprite.setOrigin(localBounds.width / 2.0f, localBounds.height / 2.0f);
     Sprite.setScale(0.45, 0.45);
@@ -42,4 +42,14 @@ const enum Piece::Type &Piece::getType() const {
 
 void Piece::setSpritePosition(float x, float y) {
     Sprite.setPosition(x, y);
+}
+
+bool Piece::isEnemy(const Piece::Ptr &piece) const {
+    return piece->Type && !((piece->Type & Type) & (~Piece::Type::NoColor));
+}
+
+void Piece::setPosition(int index) {
+    Position = index;
+    resetSpritePosition();
+    HasMoved = true;
 }

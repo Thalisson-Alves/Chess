@@ -15,6 +15,10 @@ public:
 
     void update(const sf::Window &window);
 
+    void movePieceToPosition(int positionIndex);
+
+    bool hasSelectedPiece() const;
+
 private:
     std::array<Piece::Ptr, 64> Pieces;
     int SelectedPieceIndex;
@@ -23,11 +27,12 @@ private:
     void loadPiecesFromFen(const sf::Texture &texture, const std::string &fenString);
 
     static void drawBackground(sf::RenderTarget &target, const sf::RenderStates &states);
+
     void drawPieces(sf::RenderTarget &target, sf::RenderStates &states) const;
+
     void drawSelectedPieceMoves(sf::RenderTarget &target, const sf::RenderStates &states) const;
 
-    bool hasSelectedPiece() const;
-
+    void deselectPiece();
 };
 
 
