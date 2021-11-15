@@ -16,6 +16,9 @@ private:
 
     void
     pushAttackingMoves(const std::array<Piece::Ptr, 64> &pieces, std::vector<Piece::Move> &moves, int direction) const;
+
+    void
+    pushEnPassantMoves(const std::array<Piece::Ptr, 64> &pieces, std::vector<Piece::Move> &moves, int direction) const;
 };
 
 

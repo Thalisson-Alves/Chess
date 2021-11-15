@@ -24,7 +24,9 @@ public:
     };
 
     struct Move {
-        enum class Type {None, Normal, Attack};
+        enum class Type {
+            None, Normal, Attack, EnPassant
+        };
 
         int fromPosition, toPosition;
         Move::Type type;
@@ -33,21 +35,27 @@ public:
 public:
     Piece(const sf::Texture &texture, Piece::Type type, int position);
 
-    void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
+    void draw(sf::RenderTarget &target, sf::RenderStates states) const override;
+
     void setSpritePosition(float x, float y);
+
     void resetSpritePosition();
 
     const Piece::Type &getType() const;
+
     bool isEnemy(const Piece::Ptr &piece) const;
 
     virtual std::vector<Move> getLegalMoves(const std::array<Piece::Ptr, 64> &pieces) const = 0;
+
     void setPosition(int index);
+
+    int getMoveCount() const;
 
 protected:
     Type Type;
     sf::Sprite Sprite;
     int Position;
-    bool HasMoved;
+    int MoveCount;
 };
 
 

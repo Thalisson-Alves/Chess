@@ -1,5 +1,6 @@
 #include <cassert>
 #include <iostream>
+#include <memory>
 #include "Board.h"
 #include "King.h"
 #include "Queen.h"
@@ -10,7 +11,8 @@
 #include "NullPiece.h"
 #include "Globals.h"
 
-Board::Board(const sf::Texture &texture, const std::string &fen) : Turn(Piece::Type::White), SelectedPieceIndex(-1) {
+Board::Board(const sf::Texture &texture, const std::string &fen) : Turn(Piece::Type::White), SelectedPieceIndex(-1),
+                                                                   Texture(texture) {
     loadPiecesFromFen(texture, fen);
 }
 
@@ -162,14 +164,20 @@ void Board::movePieceToPosition(int positionIndex) {
         case Piece::Move::Type::None:
             break;
         case Piece::Move::Type::Normal:
-            Pieces[move.fromPosition]->setPosition(move.toPosition);
-            Pieces[move.toPosition]->setPosition(move.fromPosition);
-            Pieces[move.fromPosition].swap(Pieces[move.toPosition]);
-            Turn = (Turn == Piece::Type::White ? Piece::Type::Black : Piece::Type::White);
+            movePieceAndUpdateTurn(move);
             break;
         case Piece::Move::Type::Attack:
+            movePieceAndUpdateTurn(move);
+            Pieces[move.fromPosition] = std::make_unique<NullPiece>(Texture, Piece::Type::None, move.fromPosition);
             break;
     }
 
     deselectPiece();
+}
+
+void Board::movePieceAndUpdateTurn(Piece::Move move) {
+    Pieces[move.fromPosition]->setPosition(move.toPosition);
+    Pieces[move.toPosition]->setPosition(move.fromPosition);
+    Pieces[move.fromPosition].swap(Pieces[move.toPosition]);
+    Turn = (Turn == Piece::Type::White ? Piece::Type::Black : Piece::Type::White);
 }

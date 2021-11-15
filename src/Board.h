@@ -20,10 +20,6 @@ public:
     bool hasSelectedPiece() const;
 
 private:
-    std::array<Piece::Ptr, 64> Pieces;
-    int SelectedPieceIndex;
-    enum Piece::Type Turn;
-
     void loadPiecesFromFen(const sf::Texture &texture, const std::string &fenString);
 
     static void drawBackground(sf::RenderTarget &target, const sf::RenderStates &states);
@@ -33,6 +29,14 @@ private:
     void drawSelectedPieceMoves(sf::RenderTarget &target, const sf::RenderStates &states) const;
 
     void deselectPiece();
+
+    void movePieceAndUpdateTurn(Piece::Move move);
+
+    std::array<Piece::Ptr, 64> Pieces;
+    int SelectedPieceIndex;
+    enum Piece::Type Turn;
+
+    const sf::Texture &Texture;
 };
 
 
