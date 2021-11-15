@@ -167,8 +167,14 @@ void Board::movePieceToPosition(int positionIndex) {
             movePieceAndUpdateTurn(move);
             break;
         case Piece::Move::Type::Attack:
+            Pieces[move.toPosition] = std::make_unique<NullPiece>(Texture, Piece::Type::None, move.toPosition);
             movePieceAndUpdateTurn(move);
-            Pieces[move.fromPosition] = std::make_unique<NullPiece>(Texture, Piece::Type::None, move.fromPosition);
+            break;
+        case Piece::Move::Type::EnPassant:
+            const auto pieceDirection = (Pieces[move.fromPosition]->getType() & Piece::Type::White) ? 1 : -1;
+            const auto toCaptureIndex = move.toPosition + 8 * pieceDirection;
+            Pieces[toCaptureIndex] = std::make_unique<NullPiece>(Texture, Piece::Type::None, move.fromPosition);
+            movePieceAndUpdateTurn(move);
             break;
     }
 
