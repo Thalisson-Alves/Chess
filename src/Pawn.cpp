@@ -18,10 +18,10 @@ std::vector<Piece::Move> Pawn::getLegalMoves(const std::array<Piece::Ptr, 64> &p
 
 void Pawn::pushAttackingMoves(const std::array<Piece::Ptr, 64> &pieces, std::vector<Piece::Move> &moves,
                               int direction) const {
-    std::vector<std::vector<int>> diagonals{{-1, direction},
-                                            {1,  direction}};
-    for (auto dir: diagonals) {
-        int x = Position % 8 + dir[0], y = Position / 8 + dir[1];
+    std::vector<std::pair<int, int>> diagonals{{-1, direction},
+                                               {1,  direction}};
+    for (auto[xOffset, yOffset]: diagonals) {
+        int x = Position % 8 + xOffset, y = Position / 8 + yOffset;
         if (Utils::isInBoardRange(x, y) && isEnemy(pieces[x + 8 * y]))
             moves.push_back({Position, x + 8 * y, Move::Type::Attack});
     }
@@ -46,10 +46,10 @@ void Pawn::pushEnPassantMoves(const std::array<Piece::Ptr, 64> &pieces, std::vec
     if (Position / 8 != enemyPawnInitialRow - 2 * direction)
         return;
 
-    std::vector<std::vector<int>> specials{{1,  0},
-                                           {-1, 0}};
-    for (auto dir: specials) {
-        int x = Position % 8 + dir[0], y = Position / 8 + dir[1];
+    std::vector<std::pair<int, int>> specials{{1,  0},
+                                              {-1, 0}};
+    for (auto[xOffset, yOffset]: specials) {
+        int x = Position % 8 + xOffset, y = Position / 8 + yOffset;
         int newPos = x + 8 * y;
         if (isEnemy(pieces[newPos]) && (pieces[newPos]->getType() & Piece::Type::NoColor) == Piece::Type::Pawn &&
             pieces[newPos]->getMoveCount() == 1)

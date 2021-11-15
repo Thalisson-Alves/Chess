@@ -52,6 +52,9 @@ public:
     int getMoveCount() const;
 
 protected:
+    void pushMovesByDirection(const std::array<Piece::Ptr, 64> &pieces, std::vector<Piece::Move> &moves,
+                              int xOffset, int yOffset, int limit = 8) const;
+
     Type Type;
     sf::Sprite Sprite;
     int Position;

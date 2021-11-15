@@ -29,8 +29,7 @@ int main() {
 
                         if (board.hasSelectedPiece())
                             board.movePieceToPosition(index);
-                        else
-                            board.selectPiece(index);
+                        board.selectPiece(index);
                     }
                     break;
                 case sf::Event::MouseButtonReleased:

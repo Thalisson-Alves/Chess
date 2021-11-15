@@ -13,5 +13,5 @@ float Config::getTileHeight() {
 }
 
 bool Utils::isInBoardRange(int x, int y) {
-    return (0 <= x && x <= Config::BoardSize) && (0 <= y && y <= Config::BoardSize);
+    return (0 <= x && x < Config::BoardSize) && (0 <= y && y < Config::BoardSize);
 }

@@ -57,3 +57,19 @@ void Piece::setPosition(int index) {
 int Piece::getMoveCount() const {
     return MoveCount;
 }
+
+void Piece::pushMovesByDirection(const std::array<Piece::Ptr, 64> &pieces, std::vector<Piece::Move> &moves,
+                                 int xOffset, int yOffset, int limit) const {
+    int x = Position % 8 + xOffset;
+    int y = Position / 8 + yOffset;
+    int counter = 0;
+
+    while (Utils::isInBoardRange(x, y) && counter < limit && pieces[x + 8 * y]->getType() == Piece::Type::None) {
+        moves.push_back({Position, x + 8 * y, Piece::Move::Type::Normal});
+        x += xOffset;
+        y += yOffset;
+    }
+
+    if (Utils::isInBoardRange(x, y) && isEnemy(pieces[x + 8 * y]))
+        moves.push_back({Position, x + 8 * y, Piece::Move::Type::Attack});
+}
