@@ -5,5 +5,18 @@ King::King(const sf::Texture &texture, enum Piece::Type type, int position) : Pi
 }
 
 std::vector<Piece::Move> King::getLegalMoves(const std::array<Piece::Ptr, 64> &pieces) const {
-    return std::vector<Piece::Move>();
+    auto moves = std::vector<Piece::Move>();
+    std::vector<std::pair<int, int>> directions{{1,  0},
+                                                {-1, 0},
+                                                {0,  1},
+                                                {0,  -1},
+                                                {1,  1},
+                                                {1,  -1},
+                                                {-1, 1},
+                                                {-1, -1}};
+
+    for (auto[xOffset, yOffset]: directions)
+        pushMovesByDirection(pieces, moves, xOffset, yOffset, 1);
+
+    return moves;
 }
