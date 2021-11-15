@@ -164,26 +164,42 @@ void Board::movePieceToPosition(int positionIndex) {
         case Piece::Move::Type::None:
             break;
         case Piece::Move::Type::Normal:
-            movePieceAndUpdateTurn(move);
+            movePiece(move);
+            updateTurn();
             break;
         case Piece::Move::Type::Attack:
             Pieces[move.toPosition] = std::make_unique<NullPiece>(Texture, Piece::Type::None, move.toPosition);
-            movePieceAndUpdateTurn(move);
+            movePiece(move);
+            updateTurn();
             break;
-        case Piece::Move::Type::EnPassant:
-            const auto pieceDirection = (Pieces[move.fromPosition]->getType() & Piece::Type::White) ? 1 : -1;
-            const auto toCaptureIndex = move.toPosition + 8 * pieceDirection;
+        case Piece::Move::Type::EnPassant: {
+            const auto toCaptureIndex = move.toPosition + 8 * (move.fromPosition < move.toPosition ? -1 : 1);
             Pieces[toCaptureIndex] = std::make_unique<NullPiece>(Texture, Piece::Type::None, move.fromPosition);
-            movePieceAndUpdateTurn(move);
+            movePiece(move);
+            updateTurn();
             break;
+        }
+        case Piece::Move::Type::Castle: {
+            int castleDirection = (move.toPosition < move.fromPosition ? -1 : 1);
+            int rookPosition;
+            if (move.fromPosition == 4 || move.fromPosition == 60)
+                rookPosition = move.fromPosition + (castleDirection < 0 ? -4 : 3);
+            else
+                rookPosition = move.fromPosition + (castleDirection < 0 ? -3 : 4);
+            movePiece({rookPosition, move.fromPosition + castleDirection, Piece::Move::Type::Normal});
+            movePiece(move);
+            updateTurn();
+            break;
+        }
     }
 
     deselectPiece();
 }
 
-void Board::movePieceAndUpdateTurn(Piece::Move move) {
+void Board::updateTurn() { Turn = (Turn == Piece::White ? Piece::Black : Piece::White); }
+
+void Board::movePiece(Piece::Move move) {
     Pieces[move.fromPosition]->setPosition(move.toPosition);
     Pieces[move.toPosition]->setPosition(move.fromPosition);
     Pieces[move.fromPosition].swap(Pieces[move.toPosition]);
-    Turn = (Turn == Piece::Type::White ? Piece::Type::Black : Piece::Type::White);
 }

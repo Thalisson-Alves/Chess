@@ -25,7 +25,7 @@ public:
 
     struct Move {
         enum class Type {
-            None, Normal, Attack, EnPassant
+            None, Normal, Attack, EnPassant, Castle
         };
 
         int fromPosition, toPosition;

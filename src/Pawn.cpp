@@ -1,17 +1,17 @@
 #include "Pawn.h"
 #include "Globals.h"
 
-Pawn::Pawn(const sf::Texture &texture, enum Piece::Type type, int position) : Piece(texture, type, position) {
+Pawn::Pawn(const sf::Texture &texture, enum Piece::Type type, int position)
+        : Piece(texture, type, position), Direction((position / Config::BoardSize) == 1 ? 1 : -1) {
 
 }
 
 std::vector<Piece::Move> Pawn::getLegalMoves(const std::array<Piece::Ptr, 64> &pieces) const {
-    int direction = (Type & Piece::Type::White ? -1 : 1);
     std::vector<Piece::Move> moves;
 
-    pushForwardMoves(pieces, moves, direction);
-    pushAttackingMoves(pieces, moves, direction);
-    pushEnPassantMoves(pieces, moves, direction);
+    pushForwardMoves(pieces, moves, Direction);
+    pushAttackingMoves(pieces, moves, Direction);
+    pushEnPassantMoves(pieces, moves, Direction);
 
     return moves;
 }

@@ -30,7 +30,9 @@ private:
 
     void deselectPiece();
 
-    void movePieceAndUpdateTurn(Piece::Move move);
+    void movePiece(Piece::Move move);
+
+    void updateTurn();
 
     std::array<Piece::Ptr, 64> Pieces;
     int SelectedPieceIndex;
