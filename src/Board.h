@@ -19,6 +19,10 @@ public:
 
     bool hasSelectedPiece() const;
 
+    enum Piece::Type getPromotionColor() const;
+
+    void promoteTo(enum Piece::Type pieceType);
+
 private:
     void loadPiecesFromFen(const sf::Texture &texture, const std::string &fenString);
 
@@ -38,6 +42,7 @@ private:
     int SelectedPieceIndex;
     enum Piece::Type Turn;
 
+    int PromotionIndex;
     const sf::Texture &Texture;
 };
 

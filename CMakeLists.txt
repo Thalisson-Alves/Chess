@@ -4,7 +4,7 @@ project(Chess)
 set(CMAKE_CXX_STANDARD 17)
 #set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -Wall -Wextra -pedantic")
 
-add_executable(Chess main.cpp
+add_executable(Chess main.cpp Game.cpp Game.h
         src/Board.cpp
         src/Piece.cpp
         src/Bishop.cpp src/Bishop.h src/King.cpp src/King.h src/Pawn.cpp src/Pawn.h src/Queen.cpp src/Queen.h src/Rook.cpp src/Rook.h src/Knight.cpp src/Knight.h src/NullPiece.cpp src/NullPiece.h src/Application.h src/Globals.cpp)

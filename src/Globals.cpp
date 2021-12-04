@@ -15,3 +15,16 @@ float Config::getTileHeight() {
 bool Utils::isInBoardRange(int x, int y) {
     return (0 <= x && x < Config::BoardSize) && (0 <= y && y < Config::BoardSize);
 }
+
+sf::IntRect Utils::getSpriteRect(const enum Piece::Type &type) {
+    if (type == Piece::Type::None)
+        return {};
+
+    const int spriteTotalSize = 200;
+    const int spriteOffset = 10;
+    const int spriteSize = spriteTotalSize - spriteOffset * 2;
+
+    return {((type & Piece::Type::NoColor) - 1) * spriteTotalSize + spriteOffset,
+            ((type & Piece::Type::Black) != 0) * spriteTotalSize + spriteOffset,
+            spriteSize, spriteSize};
+}

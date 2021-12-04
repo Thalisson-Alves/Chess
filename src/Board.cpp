@@ -1,6 +1,6 @@
 #include <cassert>
-#include <iostream>
 #include <memory>
+
 #include "Board.h"
 #include "King.h"
 #include "Queen.h"
@@ -12,7 +12,8 @@
 #include "Globals.h"
 
 Board::Board(const sf::Texture &texture, const std::string &fen) : Turn(Piece::Type::White), SelectedPieceIndex(-1),
-                                                                   Texture(texture) {
+                                                                   Texture(texture),
+                                                                   PromotionIndex(-1) {
     loadPiecesFromFen(texture, fen);
 }
 
@@ -152,6 +153,7 @@ bool Board::hasSelectedPiece() const {
 }
 
 void Board::movePieceToPosition(int positionIndex) {
+    // TODO - limit pieces position if their king is in check
     if (not hasSelectedPiece() || positionIndex == SelectedPieceIndex)
         return;
 
@@ -193,6 +195,10 @@ void Board::movePieceToPosition(int positionIndex) {
         }
     }
 
+    if ((Pieces[move.toPosition]->getType() & Piece::Type::NoColor) == Piece::Type::Pawn
+        && move.toPosition / Config::BoardSize == (move.toPosition < move.fromPosition ? 0 : Config::BoardSize - 1))
+        PromotionIndex = move.toPosition;
+
     deselectPiece();
 }
 
@@ -202,4 +208,35 @@ void Board::movePiece(Piece::Move move) {
     Pieces[move.fromPosition]->setPosition(move.toPosition);
     Pieces[move.toPosition]->setPosition(move.fromPosition);
     Pieces[move.fromPosition].swap(Pieces[move.toPosition]);
+}
+
+enum Piece::Type Board::getPromotionColor() const {
+    if (PromotionIndex < 0)
+        return Piece::Type::NoColor;
+    return static_cast<enum Piece::Type>(Pieces[PromotionIndex]->getType() & ~Piece::Type::NoColor);
+}
+
+void Board::promoteTo(enum Piece::Type pieceType) {
+    if (PromotionIndex < 0)
+        return;
+
+    auto promotionColor = Pieces[PromotionIndex]->getType() & ~Piece::Type::NoColor;
+    pieceType = static_cast<enum Piece::Type>(pieceType | promotionColor);
+
+    switch (pieceType & Piece::Type::NoColor) {
+        case Piece::Type::Queen:
+            Pieces[PromotionIndex] = std::make_unique<Queen>(Texture, pieceType, PromotionIndex);
+            break;
+        case Piece::Type::Bishop:
+            Pieces[PromotionIndex] = std::make_unique<Bishop>(Texture, pieceType, PromotionIndex);
+            break;
+        case Piece::Type::Knight:
+            Pieces[PromotionIndex] = std::make_unique<Knight>(Texture, pieceType, PromotionIndex);
+            break;
+        case Piece::Type::Rook:
+            Pieces[PromotionIndex] = std::make_unique<Rook>(Texture, pieceType, PromotionIndex);
+            break;
+    }
+
+    PromotionIndex = -1;
 }
