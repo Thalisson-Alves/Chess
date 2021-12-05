@@ -2,12 +2,18 @@ cmake_minimum_required(VERSION 3.20)
 project(Chess)
 
 set(CMAKE_CXX_STANDARD 17)
-#set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -Wall -Wextra -pedantic")
 
-add_executable(Chess main.cpp Game.cpp Game.h
+add_executable(Chess main.cpp Game.cpp
         src/Board.cpp
         src/Piece.cpp
-        src/Bishop.cpp src/Bishop.h src/King.cpp src/King.h src/Pawn.cpp src/Pawn.h src/Queen.cpp src/Queen.h src/Rook.cpp src/Rook.h src/Knight.cpp src/Knight.h src/NullPiece.cpp src/NullPiece.h src/Application.h src/Globals.cpp)
+        src/Bishop.cpp
+        src/King.cpp
+        src/Pawn.cpp
+        src/Queen.cpp
+        src/Rook.cpp
+        src/Knight.cpp
+        src/NullPiece.cpp
+        src/Globals.cpp)
 
 set(SFML_STATIC_LIBRARIES TRUE)
 set(SFML_DIR C:/SFML/lib/cmake/SFML)
