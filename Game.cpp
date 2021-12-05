@@ -47,11 +47,9 @@ void Game::Run() {
                     }
                     break;
                 default:
-                    break;
+                    continue;
             }
         }
-
-        board.update(window);
 
         window.clear();
         window.draw(board);

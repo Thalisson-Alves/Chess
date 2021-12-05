@@ -35,28 +35,7 @@ void Board::loadPiecesFromFen(const sf::Texture &texture, const std::string &fen
             char lowerChar = std::tolower(fenString[i]);
             auto pieceColor = isupper(fenString[i]) ? Piece::Type::White : Piece::Type::Black;
             auto pieceType = static_cast<enum Piece::Type>(piecesType[lowerChar] | pieceColor);
-            switch (piecesType[lowerChar]) {
-                case Piece::Type::King:
-                    Pieces[pos] = std::make_unique<King>(texture, pieceType, pos);
-                    break;
-                case Piece::Type::Queen:
-                    Pieces[pos] = std::make_unique<Queen>(texture, pieceType, pos);
-                    break;
-                case Piece::Type::Bishop:
-                    Pieces[pos] = std::make_unique<Bishop>(texture, pieceType, pos);
-                    break;
-                case Piece::Type::Knight:
-                    Pieces[pos] = std::make_unique<Knight>(texture, pieceType, pos);
-                    break;
-                case Piece::Type::Rook:
-                    Pieces[pos] = std::make_unique<Rook>(texture, pieceType, pos);
-                    break;
-                case Piece::Type::Pawn:
-                    Pieces[pos] = std::make_unique<Pawn>(texture, pieceType, pos);
-                    break;
-                default:
-                    break;
-            }
+            Pieces[pos] = createPieceForType(pieceType, pos);
             pos++;
         }
     }
@@ -88,7 +67,10 @@ void Board::drawSelectedPieceMoves(sf::RenderTarget &target, const sf::RenderSta
     rectangle.setOutlineColor(sf::Color(255, 0, 0, 100));
     rectangle.setOutlineThickness(3);
 
-    for (auto move: Pieces[SelectedPieceIndex]->getLegalMoves(Pieces)) {
+    auto color = static_cast<enum Piece::Type>(Pieces[SelectedPieceIndex]->getType() & ~Piece::Type::NoColor);
+    auto filteredMoves = filterByCheck(Pieces[SelectedPieceIndex]->getLegalMoves(Pieces), color);
+
+    for (auto move: filteredMoves) {
         int x = move.toPosition % 8;
         int y = move.toPosition / 8;
         auto position = sf::Vector2f(x * Config::getTileWidth() + Config::getTileWidth() / 2.0f,
@@ -137,48 +119,47 @@ void Board::deselectPiece() {
     SelectedPieceIndex = -1;
 }
 
-void Board::update(const sf::Window &window) {
-    if (not hasSelectedPiece())
-        return;
-
-    // The piece follow the mouse
-    if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
-        auto mousePosition = sf::Mouse::getPosition(window);
-        Pieces[SelectedPieceIndex]->setSpritePosition(mousePosition.x, mousePosition.y);
-    }
-}
-
 bool Board::hasSelectedPiece() const {
     return SelectedPieceIndex >= 0;
 }
 
 void Board::movePieceToPosition(int positionIndex) {
-    // TODO - limit pieces position if their king is in check
     if (not hasSelectedPiece() || positionIndex == SelectedPieceIndex)
         return;
 
     Piece::Move move{};
-    for (auto possibleMove: Pieces[SelectedPieceIndex]->getLegalMoves(Pieces))
+    auto color = static_cast<enum Piece::Type>(Pieces[SelectedPieceIndex]->getType() & ~Piece::Type::NoColor);
+    auto filteredMoves = filterByCheck(Pieces[SelectedPieceIndex]->getLegalMoves(Pieces), color);
+    for (auto possibleMove: filteredMoves)
         if (possibleMove.toPosition == positionIndex)
             move = possibleMove;
 
+    if (!makeMove(Pieces, move)) return;
+
+    updateTurn();
+
+    if ((Pieces[move.toPosition]->getType() & Piece::Type::NoColor) == Piece::Type::Pawn
+        && move.toPosition / Config::BoardSize == (move.toPosition < move.fromPosition ? 0 : Config::BoardSize - 1))
+        PromotionIndex = move.toPosition;
+
+    deselectPiece();
+}
+
+bool Board::makeMove(std::array<Piece::Ptr, 64> &pieces, Piece::Move move) const {
     switch (move.type) {
         case Piece::Move::Type::None:
-            break;
+            return false;
         case Piece::Move::Type::Normal:
-            movePiece(move);
-            updateTurn();
+            movePiece(pieces, move);
             break;
         case Piece::Move::Type::Attack:
-            Pieces[move.toPosition] = std::make_unique<NullPiece>(Texture, Piece::Type::None, move.toPosition);
-            movePiece(move);
-            updateTurn();
+            pieces[move.toPosition] = std::make_unique<NullPiece>(Texture, Piece::Type::None, move.toPosition);
+            movePiece(pieces, move);
             break;
         case Piece::Move::Type::EnPassant: {
             const auto toCaptureIndex = move.toPosition + 8 * (move.fromPosition < move.toPosition ? -1 : 1);
-            Pieces[toCaptureIndex] = std::make_unique<NullPiece>(Texture, Piece::Type::None, move.fromPosition);
-            movePiece(move);
-            updateTurn();
+            pieces[toCaptureIndex] = std::make_unique<NullPiece>(Texture, Piece::Type::None, move.fromPosition);
+            movePiece(pieces, move);
             break;
         }
         case Piece::Move::Type::Castle: {
@@ -188,26 +169,20 @@ void Board::movePieceToPosition(int positionIndex) {
                 rookPosition = move.fromPosition + (castleDirection < 0 ? -4 : 3);
             else
                 rookPosition = move.fromPosition + (castleDirection < 0 ? -3 : 4);
-            movePiece({rookPosition, move.fromPosition + castleDirection, Piece::Move::Type::Normal});
-            movePiece(move);
-            updateTurn();
+            movePiece(pieces, {rookPosition, move.fromPosition + castleDirection, Piece::Move::Type::Normal});
+            movePiece(pieces, move);
             break;
         }
     }
-
-    if ((Pieces[move.toPosition]->getType() & Piece::Type::NoColor) == Piece::Type::Pawn
-        && move.toPosition / Config::BoardSize == (move.toPosition < move.fromPosition ? 0 : Config::BoardSize - 1))
-        PromotionIndex = move.toPosition;
-
-    deselectPiece();
+    return true;
 }
 
 void Board::updateTurn() { Turn = (Turn == Piece::White ? Piece::Black : Piece::White); }
 
-void Board::movePiece(Piece::Move move) {
-    Pieces[move.fromPosition]->setPosition(move.toPosition);
-    Pieces[move.toPosition]->setPosition(move.fromPosition);
-    Pieces[move.fromPosition].swap(Pieces[move.toPosition]);
+void Board::movePiece(std::array<Piece::Ptr, 64> &pieces, Piece::Move move) {
+    pieces[move.fromPosition]->setPosition(move.toPosition);
+    pieces[move.toPosition]->setPosition(move.fromPosition);
+    pieces[move.fromPosition].swap(pieces[move.toPosition]);
 }
 
 enum Piece::Type Board::getPromotionColor() const {
@@ -222,21 +197,75 @@ void Board::promoteTo(enum Piece::Type pieceType) {
 
     auto promotionColor = Pieces[PromotionIndex]->getType() & ~Piece::Type::NoColor;
     pieceType = static_cast<enum Piece::Type>(pieceType | promotionColor);
+    Pieces[PromotionIndex] = createPieceForType(pieceType, PromotionIndex);
 
+    PromotionIndex = -1;
+}
+
+std::vector<Piece::Move> Board::filterByCheck(const std::vector<Piece::Move> &moves, enum Piece::Type color) const {
+    std::vector<Piece::Move> filteredMoves;
+    for (const auto &move: moves) {
+        if (!isInCheck(evaluateMove(move), color))
+            filteredMoves.emplace_back(move);
+    }
+
+    return filteredMoves;
+}
+
+bool Board::isInCheck(const std::array<Piece::Ptr, 64> &pieces, enum Piece::Type color) {
+    // Determine king's position in `pieces`
+    int kingPosition;
+    for (size_t i = 0; i < pieces.size(); i++) {
+        if (pieces[i]->getType() == (Piece::Type::King | color))
+            kingPosition = i;
+    }
+
+    for (const auto &piece: pieces) {
+        if ((piece->getType() & ~Piece::Type::NoColor) == color)
+            continue;
+        for (const auto &move: piece->getLegalMoves(pieces)) {
+            if (move.toPosition == kingPosition)
+                return true;
+        }
+    }
+    return false;
+}
+
+std::array<Piece::Ptr, 64> Board::evaluateMove(Piece::Move move) const {
+    std::array<Piece::Ptr, 64> pieces;
+    for (int i = 0; i < pieces.size(); i++) {
+        pieces[i] = createPieceForType(Pieces[i]->getType(), i);
+    }
+    makeMove(pieces, move);
+
+    return pieces;
+}
+
+Piece::Ptr Board::createPieceForType(enum Piece::Type pieceType, int position) const {
+    Piece::Ptr piece;
     switch (pieceType & Piece::Type::NoColor) {
+        case Piece::Type::King:
+            piece = std::make_unique<King>(Texture, pieceType, position);
+            break;
         case Piece::Type::Queen:
-            Pieces[PromotionIndex] = std::make_unique<Queen>(Texture, pieceType, PromotionIndex);
+            piece = std::make_unique<Queen>(Texture, pieceType, position);
             break;
         case Piece::Type::Bishop:
-            Pieces[PromotionIndex] = std::make_unique<Bishop>(Texture, pieceType, PromotionIndex);
+            piece = std::make_unique<Bishop>(Texture, pieceType, position);
             break;
         case Piece::Type::Knight:
-            Pieces[PromotionIndex] = std::make_unique<Knight>(Texture, pieceType, PromotionIndex);
+            piece = std::make_unique<Knight>(Texture, pieceType, position);
             break;
         case Piece::Type::Rook:
-            Pieces[PromotionIndex] = std::make_unique<Rook>(Texture, pieceType, PromotionIndex);
+            piece = std::make_unique<Rook>(Texture, pieceType, position);
+            break;
+        case Piece::Type::Pawn:
+            piece = std::make_unique<Pawn>(Texture, pieceType, position);
+            break;
+        default:
+            piece = std::make_unique<NullPiece>(Texture, Piece::Type::None, position);
             break;
     }
 
-    PromotionIndex = -1;
+    return piece;
 }

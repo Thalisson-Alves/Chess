@@ -13,8 +13,6 @@ public:
 
     void selectPiece(int index);
 
-    void update(const sf::Window &window);
-
     void movePieceToPosition(int positionIndex);
 
     bool hasSelectedPiece() const;
@@ -34,9 +32,19 @@ private:
 
     void deselectPiece();
 
-    void movePiece(Piece::Move move);
+    static void movePiece(std::array<Piece::Ptr, 64> &pieces, Piece::Move move);
 
     void updateTurn();
+
+    static bool isInCheck(const std::array<Piece::Ptr, 64> &pieces, enum Piece::Type color);
+
+    Piece::Ptr createPieceForType(enum Piece::Type pieceType, int position) const;
+
+    bool makeMove(std::array<Piece::Ptr, 64> &pieces, Piece::Move move) const;
+
+    std::array<Piece::Ptr, 64> evaluateMove(Piece::Move move) const;
+
+    std::vector<Piece::Move> filterByCheck(const std::vector<Piece::Move> &moves, enum Piece::Type color) const;
 
     std::array<Piece::Ptr, 64> Pieces;
     int SelectedPieceIndex;

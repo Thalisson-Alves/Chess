@@ -27,10 +27,6 @@ const enum Piece::Type &Piece::getType() const {
     return Type;
 }
 
-void Piece::setSpritePosition(float x, float y) {
-    Sprite.setPosition(x, y);
-}
-
 bool Piece::isEnemy(const Piece::Ptr &piece) const {
     return piece->Type && !((piece->Type & Type) & (~Piece::Type::NoColor));
 }

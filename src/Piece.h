@@ -37,8 +37,6 @@ public:
 
     void draw(sf::RenderTarget &target, sf::RenderStates states) const override;
 
-    void setSpritePosition(float x, float y);
-
     void resetSpritePosition();
 
     const Piece::Type &getType() const;
